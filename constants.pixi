@@ -1,0 +1,20 @@
+scr = get_screen()
+XMIN = -get_xsize(scr) / 2
+XMAX = get_xsize(scr) / 2
+YMIN = -get_ysize(scr) / 2
+YMAX = get_ysize(scr) / 2
+
+BORDER = 5
+BORDERS = BORDER * 2
+WAVE_WIDTH = XMAX - XMIN - BORDERS
+WAVE_HEIGHT = (YMAX - YMIN) * .75 - BORDERS
+
+BUTTON_COUNT = 3
+BUTTON_WIDTH = (XMAX - XMIN) / 3 - BORDERS
+BUTTON_HEIGHT = (YMAX - YMIN) * .25 - BORDERS
+ 
+BUTTON_ROW = YMIN + WAVE_HEIGHT + BORDERS
+
+BUTTON1 = XMIN
+BUTTON2 = XMIN + (XMAX - XMIN) * 1/3
+BUTTON3 = XMIN + (XMAX - XMIN) * 2/3

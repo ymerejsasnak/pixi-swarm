@@ -1,0 +1,160 @@
+// need to handle stereo wavs!!! and 32 bit wavs
+
+// need to reset pointers on loading new wav
+
+// draw playback indicators for each pointer? (brightness as volume too)
+
+// need to scale volume down per voice
+
+//possible controls/options/etc:
+// swarm density (# of pointers)
+// loop length (per pointer)
+// loop change probability, loop change range
+// direction (forward or reverse)
+// main loop start point
+// loop start range
+// options for crossfading each loop????
+// attack/release time (for when adding or removing 'voices')
+
+// multiple xy pads (color coded, faded color when not controlled)
+// select which to use w/ buttons
+
+
+
+set_pixel_size(1)
+
+resize( get_screen(), WINDOW_XSIZE, WINDOW_YSIZE )
+
+
+include "includes.pixi"
+
+
+
+
+load_wav()
+
+buttons = create_buttons()
+
+
+touch_state = new()
+touch_state.down = 0
+touch_state.up = 0
+touch_state.move = 0
+
+
+
+
+   ////////////
+
+
+num_ptrs = 1000
+ptrs = new(num_ptrs, 1, INT32)
+data = wave_window.sample_info[SMP_SRC]
+size = get_xsize(data)
+
+//init positions
+i = 0
+while (i < num_ptrs)
+{
+    ptrs[i] = randint(size)
+    i + 1
+}
+
+
+/////////
+
+
+
+
+
+
+$sample = wave_window.sample_info
+set_audio_callback(audio_callback, $sample, 44100, get_type( $sample[SMP_SRC] ), 1 ,AUDIO_FLAG_INTERP2 )
+
+
+while (1)
+{
+    while get_event()
+    {
+        touch_state.down = 0
+        touch_state.up = 0
+        touch_state.move = 0 
+               
+        if EVT[EVT_TYPE] == EVT_QUIT { cleanup() }
+        
+        if EVT[EVT_TYPE] == EVT_MOUSEBUTTONUP
+            { touch_state.up = 1 }
+        
+  		if EVT[EVT_TYPE] == EVT_MOUSEMOVE 
+            { touch_state.move = 1 }
+        
+  		if EVT[EVT_TYPE] == EVT_MOUSEBUTTONDOWN 
+            { touch_state.down = 1 }
+  		
+  	  		
+  	    touch_state.x = EVT[ EVT_X ]
+  		touch_state.y = EVT[ EVT_Y ]
+  		
+  		
+  		wave_window.update(wave_window, touch_state)
+  		buttons.update(buttons, touch_state)
+  	}
+  	
+  	
+  	
+  	clear(get_blend(BLACK, WHITE, 130))
+  	
+  	
+  	wave_window.draw(wave_window)
+  	buttons.draw(buttons)
+  	
+  	printnum(x, 0, 0)
+  	printnum(y, 0, 20)
+  	
+  	frame()
+  	
+  	
+}
+
+
+
+fn cleanup()
+{
+
+    set_audio_callback(-1)
+    
+    
+    
+    halt
+}
+
+
+
+fn load_wav()
+{
+
+    set_audio_callback(-1)
+    $file = file_dialog( "Select a wav file", "wav", "fff" )
+    if $file > -1
+    {
+        if wave_window
+        {
+            remove(wave_window)
+        }
+        $wav_data = load($file)
+        
+        wave_window = create_wave_window(
+                                        $wav_data, 
+                                        XMIN + BORDER, 
+                                        YMIN + BORDER, 
+                                        WAVE_WIDTH, 
+                                        WAVE_HEIGHT
+                                        )
+    }
+    $sample = wave_window.sample_info
+    set_audio_callback(audio_callback, $sample, 44100, get_type( $sample[SMP_SRC] ), 1 ,AUDIO_FLAG_INTERP2 )
+
+}
+
+
+  		

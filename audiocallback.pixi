@@ -1,0 +1,75 @@
+
+
+
+fn audio_callback(
+    $stream, 
+    $userdata, 
+    $channels, 
+    $frames, 
+    $output_time_in_system_ticks, 
+    $in_channels, 
+    $latency_in_frames )
+{
+x=ptrs[0]
+y=ptrs[1]	
+	
+    $wav_data = clone($userdata[SMP_SRC])
+    $size = get_xsize($wav_data)
+	$type = get_type($wav_data)
+	
+	//$ch_count = $wav_data.channels
+	
+	$buf = new($frames, 1, $type)
+	clean($buf)
+	 
+    /*$c = 0 
+    while( $c < $ch_count )
+    {
+	copy( $buf[ $c ], $userdata, 0, ptrs[0] + $c, $frames, 1, $ch_count )
+	    $c + 1
+    }
+    
+    
+	ptrs[0] = (ptrs[0] + $frames * wav_channels) % size
+	*/
+	
+    //s = $wav_data[0][ptrs[0]]
+    //$c = 0    
+   // while( $c < $ch_count )
+   // {
+   
+   
+   
+   
+   //scale values?
+   op_cn(OP_DIV, $wav_data, 13)
+   
+   
+   
+   $p = 0
+   while ($p < num_ptrs)
+   {
+   op_cc(OP_SADD, $buf, $wav_data, 0, ptrs[$p], $frames)
+   
+      ptrs[$p] = (ptrs[$p] + $frames) % $size
+      $p + 1
+    }
+
+	
+	    
+	    $max = op_cn(OP_ABSMAX, $buf)
+	    
+	    //op_cn(OP_MUL, $buf, 32767 / $max)
+	    
+        copy($channels[0], $buf, 0, 0, $frames)
+     //   $c + 1
+    //}
+    remove($buf)
+    remove($wav_data)
+      
+    ret( 1 )
+}
+ 
+
+
+

@@ -1,0 +1,75 @@
+
+fn create_button($x, $y, $xsize, $ysize, $text, $func, $obj)
+{
+
+	$this = new()
+	
+	$this.text = $text
+	$this.x = $x
+	$this.y = $y
+	$this.xsize = $xsize
+	$this.ysize = $ysize
+	$this.on = 0
+	
+	$this.func = $func
+	$this.obj = $obj
+		
+	
+	$this.draw =
+	{
+	    $this = $1
+	    
+	    if $this.on
+	    {
+		    fbox($this.x, $this.y, $this.xsize, $this.ysize, get_blend(BLACK, WHITE, 210))
+		    box($this.x, $this.y, $this.xsize, $this.ysize, get_blend(BLACK, WHITE, 40))
+		    print($this.text, $this.x + $this.xsize / 2, 
+		          $this.y + $this.ysize / 2, BLACK)
+		}
+		else
+		{
+		    fbox($this.x, $this.y, $this.xsize, $this.ysize, get_blend(BLACK, WHITE, 40))
+		    box($this.x, $this.y, $this.xsize, $this.ysize, get_blend(BLACK, WHITE, 210))
+		    print($this.text, $this.x + $this.xsize / 2,
+		          $this.y + $this.ysize / 2, WHITE)		
+		}
+	}	
+	
+	
+	$this.update = 
+    {
+        $this = $1
+        $touch_state = $2
+       
+              
+         
+                       
+                        
+        // reset if already turned on
+        if $this.on
+        {
+            $this.on = 0
+        }
+             
+        
+        // send trigger func when clicked
+        if $touch_state.down && $this.on == 0
+        {
+            if $touch_state.x > $this.x && $touch_state.x < $this.x + $this.xsize &&
+               $touch_state.y > $this.y && $touch_state.y < $this.y + $this.ysize
+            {
+                $this.on = 1
+                $this.func($this.obj)
+                $touch_state.down = 0
+            }
+        }
+      
+        
+        
+	}   
+    
+	ret ($this)
+}
+
+
+

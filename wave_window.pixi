@@ -1,0 +1,109 @@
+fn create_wave_window($data, $x, $y, $xsize, $ysize)
+{
+    $this = new()
+    
+    $this.data = $data
+    $this.x = $x
+    $this.y = $y
+    $this.xsize = $xsize
+    $this.ysize = $ysize
+    
+    $this.sample_info = load_sample($this.data)
+    
+    $this.plotmax = new($xsize)
+    $this.plotmin = new($xsize)
+    
+    $this.posx = $x
+    $this.posy = $y + $ysize
+                
+    $this.touch = 0
+    
+    $i = 0
+    $step = get_size($this.data) / $xsize
+    while ($i < $xsize)
+    {
+        $max = $this.data[$i * $step]
+        $min = $this.data[$i * $step]
+        
+        $j = 1
+        while ($j < $step)
+        {
+            if $this.data[$i * $step + $j] > $max
+                {$max = $this.data[$i * $step + $j]}
+            
+            if $this.data[$i * $step + $j] < $min
+                {$min = $this.data[$i * $step + $j]}
+                
+            $j + 1
+        }
+        
+        $this.plotmax[$i] = scale($max, -(1<<15), (1<<15), -$this.ysize/2, $this.ysize/2)       
+        $this.plotmin[$i] = scale($min, -(1<<15), (1<<15), -$this.ysize/2, $this.ysize/2)
+        
+        $i + 1
+    }
+    
+    
+ 
+    $this.update =
+    {
+        $this = $1
+        $touch_state = $2
+        
+        
+        if $touch_state.down
+        {
+            $this.touch = 1
+        }
+        if $touch_state.up
+        {
+            $this.touch = 0
+        }
+        
+        if $this.touch && 
+             $touch_state.x > $this.x && $touch_state.x < $this.x + $this.xsize &&
+             $touch_state.y > $this.y && $touch_state.y < $this.y + $this.ysize
+        {
+            $this.posx = $touch_state.x
+            $this.posy = $touch_state.y      
+            
+            ret(1)     
+        }
+        
+        ret(0)
+    }
+        
+    
+    
+    
+    $this.draw = 
+    {
+        $this = $1
+    
+        fbox($this.x, $this.y, $this.xsize, $this.ysize, get_blend(BLACK, WHITE, 20))
+        box($this.x - 1, $this.y - 1, $this.xsize + 2, $this.ysize + 2, WHITE)
+        $midline = $this.y + $this.ysize / 2
+        
+        $i = 0
+        while ($i < $this.xsize)
+        {
+            line($i + $this.x, $midline + $this.plotmax[$i], $i + $this.x, $midline + $this.plotmin[$i], GREEN)
+            $i + 1
+        }
+        
+       
+                
+        line($this.x, $midline, $this.x + $this.xsize, $midline, WHITE)
+        
+        //xy lines
+        line($this.posx, $this.y, $this.posx, $this.y + $this.ysize, RED)
+        line($this.x, $this.posy, $this.x + $this.xsize, $this.posy, RED)
+        
+    }   
+    
+    
+    
+    
+    
+    ret ($this)
+}
