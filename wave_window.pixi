@@ -7,9 +7,7 @@ fn create_wave_window($data, $x, $y, $xsize, $ysize)
     $this.y = $y
     $this.xsize = $xsize
     $this.ysize = $ysize
-    
-    $this.sample_info = load_sample($this.data)
-    
+
     $this.plotmax = new($xsize)
     $this.plotmin = new($xsize)
     
@@ -99,6 +97,12 @@ fn create_wave_window($data, $x, $y, $xsize, $ysize)
         line($this.posx, $this.y, $this.posx, $this.y + $this.ysize, RED)
         line($this.x, $this.posy, $this.x + $this.xsize, $this.posy, RED)
         
+        $p = 0
+        while ($p < swarm.voice_count)
+        {
+            dot(scale(swarm.pointers[$p], 0, swarm.wav_size, $this.x, $this.x + $this.xsize), $this.y + 5)
+            $p + 1
+        }
     }   
     
     

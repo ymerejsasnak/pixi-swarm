@@ -1,0 +1,35 @@
+fn create_swarm()
+{
+    $this = new()
+    $this.voice_count = 200
+    $this.pointers = new($this.voice_count, 1, INT32)
+    
+       
+    max_frames = 4096  //??
+    
+    
+        $this.wav_data = wave_window.data
+        $this.wav_size = get_xsize($this.wav_data)
+        $this.wav_type = get_type($this.wav_data)
+    
+        
+        $this.buffer = new(max_frames, 1, $this.wav_type)
+    
+    $this.init_swarm = 
+    {
+        $this = $1
+        
+        
+    
+        $i = 0
+        while ($i < $this.voice_count)
+        {
+            $this.pointers[$i] = randint($this.wav_size)
+            $i + 1
+        }
+    }
+
+
+    ret($this)
+
+}

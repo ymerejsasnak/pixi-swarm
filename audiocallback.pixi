@@ -1,6 +1,3 @@
-
-
-
 fn audio_callback(
     $stream, 
     $userdata, 
@@ -10,63 +7,25 @@ fn audio_callback(
     $in_channels, 
     $latency_in_frames )
 {
-x=ptrs[0]
-y=ptrs[1]	
+
 	
-    $wav_data = clone($userdata[SMP_SRC])
-    $size = get_xsize($wav_data)
-	$type = get_type($wav_data)
-	
-	//$ch_count = $wav_data.channels
-	
-	$buf = new($frames, 1, $type)
-	clean($buf)
-	 
-    /*$c = 0 
-    while( $c < $ch_count )
+   
+    clean(swarm.buffer, 0, 0, $frames)
+    
+    $p = 0
+    while ($p < swarm.voice_count)
     {
-	copy( $buf[ $c ], $userdata, 0, ptrs[0] + $c, $frames, 1, $ch_count )
-	    $c + 1
-    }
-    
-    
-	ptrs[0] = (ptrs[0] + $frames * wav_channels) % size
-	*/
-	
-    //s = $wav_data[0][ptrs[0]]
-    //$c = 0    
-   // while( $c < $ch_count )
-   // {
+        op_cc(OP_SADD, swarm.buffer, swarm.wav_data, 0, swarm.pointers[$p], $frames)
    
-   
-   
-   
-   //scale values?
-   op_cn(OP_DIV, $wav_data, 13)
-   
-   
-   
-   $p = 0
-   while ($p < num_ptrs)
-   {
-   op_cc(OP_SADD, $buf, $wav_data, 0, ptrs[$p], $frames)
-   
-      ptrs[$p] = (ptrs[$p] + $frames) % $size
-      $p + 1
+        swarm.pointers[$p] = (swarm.pointers[$p] + $frames) % swarm.wav_size
+        $p + 1
     }
 
 	
+
 	    
-	    $max = op_cn(OP_ABSMAX, $buf)
-	    
-	    //op_cn(OP_MUL, $buf, 32767 / $max)
-	    
-        copy($channels[0], $buf, 0, 0, $frames)
-     //   $c + 1
-    //}
-    remove($buf)
-    remove($wav_data)
-      
+    copy($channels[0], swarm.buffer, 0, 0, $frames)
+    
     ret( 1 )
 }
  

@@ -5,6 +5,8 @@
 // draw playback indicators for each pointer? (brightness as volume too)
 
 // need to scale volume down per voice
+// convert to 32 bit for more headroom? then normalize before outputing?
+
 
 //possible controls/options/etc:
 // swarm density (# of pointers)
@@ -26,12 +28,25 @@ set_pixel_size(1)
 resize( get_screen(), WINDOW_XSIZE, WINDOW_YSIZE )
 
 
-include "includes.pixi"
+
+include "constants.pixi"
+include "util.pixi"
+
+include "wave_window.pixi"
+include "swarm.pixi"
+include "audiocallback.pixi"
+
+include "button.pixi"
+include "buttons.pixi"
 
 
 
 
 load_wav()
+
+swarm = create_swarm()
+swarm.init_pointers(swarm)
+
 
 buttons = create_buttons()
 
@@ -44,32 +59,6 @@ touch_state.move = 0
 
 
 
-   ////////////
-
-
-num_ptrs = 1000
-ptrs = new(num_ptrs, 1, INT32)
-data = wave_window.sample_info[SMP_SRC]
-size = get_xsize(data)
-
-//init positions
-i = 0
-while (i < num_ptrs)
-{
-    ptrs[i] = randint(size)
-    i + 1
-}
-
-
-/////////
-
-
-
-
-
-
-$sample = wave_window.sample_info
-set_audio_callback(audio_callback, $sample, 44100, get_type( $sample[SMP_SRC] ), 1 ,AUDIO_FLAG_INTERP2 )
 
 
 while (1)
@@ -108,8 +97,7 @@ while (1)
   	wave_window.draw(wave_window)
   	buttons.draw(buttons)
   	
-  	printnum(x, 0, 0)
-  	printnum(y, 0, 20)
+  	printnum(s, 0, 0)
   	
   	frame()
   	
@@ -150,9 +138,10 @@ fn load_wav()
                                         WAVE_WIDTH, 
                                         WAVE_HEIGHT
                                         )
+
     }
-    $sample = wave_window.sample_info
-    set_audio_callback(audio_callback, $sample, 44100, get_type( $sample[SMP_SRC] ), 1 ,AUDIO_FLAG_INTERP2 )
+    $wav_data = wave_window.data
+    set_audio_callback(audio_callback, 0, 44100, get_type( $wav_data ), 1 ,AUDIO_FLAG_INTERP2 )
 
 }
 
