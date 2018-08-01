@@ -2,7 +2,15 @@ fn create_buttons()
 {
     $this = new(BUTTON_COUNT)
     
-    $this[0] = create_button(BUTTON1 + BORDER, BUTTON_ROW + BORDER, BUTTON_WIDTH, BUTTON_HEIGHT, "LOAD", load_wav)
+    $this[0] = create_button(BUTTON1 + BORDER, BUTTON_ROW + BORDER, BUTTON_WIDTH, BUTTON_HEIGHT, 
+    "LOAD", {
+                load_wav()
+                $wav_data = wave_window.data
+                swarm.wav_data = wave_window.data
+                swarm.init_swarm(swarm)
+                set_audio_callback(audio_callback, 0, 44100, get_type( $wav_data ), 1 ,AUDIO_FLAG_INTERP2 )
+            })
+            
     $this[1] = create_button(BUTTON2 + BORDER, BUTTON_ROW + BORDER, BUTTON_WIDTH, BUTTON_HEIGHT, "REC")
     $this[2] = create_button(BUTTON3 + BORDER, BUTTON_ROW + BORDER, BUTTON_WIDTH, BUTTON_HEIGHT, "EXIT", cleanup)
 

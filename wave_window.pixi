@@ -12,7 +12,7 @@ fn create_wave_window($data, $x, $y, $xsize, $ysize)
     $this.plotmin = new($xsize)
     
     $this.posx = $x
-    $this.posy = $y + $ysize
+    $this.posy = $y
                 
     $this.touch = 0
     
@@ -63,7 +63,19 @@ fn create_wave_window($data, $x, $y, $xsize, $ysize)
              $touch_state.y > $this.y && $touch_state.y < $this.y + $this.ysize
         {
             $this.posx = $touch_state.x
-            $this.posy = $touch_state.y      
+            swarm.start_pos = scale($this.posx, $this.x, $this.x + $this.xsize, 0, swarm.wav_size)
+            
+            
+            
+            $this.posy = $touch_state.y 
+            swarm.loop_length = scale($this.posy, $this.y + $this.ysize, $this.y, 100, swarm.wav_size)
+            
+            if swarm.loop_length + swarm.start_pos >= swarm.wav_size
+            {
+                swarm.loop_length = swarm.wav_size - swarm.start_pos
+            }     
+          
+            
             
             ret(1)     
         }
@@ -94,13 +106,16 @@ fn create_wave_window($data, $x, $y, $xsize, $ysize)
         line($this.x, $midline, $this.x + $this.xsize, $midline, WHITE)
         
         //xy lines
-        line($this.posx, $this.y, $this.posx, $this.y + $this.ysize, RED)
-        line($this.x, $this.posy, $this.x + $this.xsize, $this.posy, RED)
+        line($this.posx, $this.y, $this.posx, $this.y + $this.ysize, BLUE)
+        //line($this.x, $this.posy, $this.x + $this.xsize, $this.posy, RED)
+        $end = scale(swarm.start_pos + swarm.loop_length, 0, swarm.wav_size, $this.x, $this.x + $this.xsize)
+        line($end, $this.y, $end, $this.y + $this.ysize, BLUE)
         
         $p = 0
         while ($p < swarm.voice_count)
         {
-            dot(scale(swarm.pointers[$p], 0, swarm.wav_size, $this.x, $this.x + $this.xsize), $this.y + 5)
+            dot(scale(swarm.pointers[$p], 0, swarm.wav_size, $this.x, $this.x + $this.xsize), 
+                scale($p, 0, swarm.voice_count, $this.y + 1, $this.y + $this.ysize - 1))
             $p + 1
         }
     }   

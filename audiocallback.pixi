@@ -17,7 +17,19 @@ fn audio_callback(
     {
         op_cc(OP_SADD, swarm.buffer, swarm.wav_data, 0, swarm.pointers[$p], $frames)
    
-        swarm.pointers[$p] = (swarm.pointers[$p] + $frames) % swarm.wav_size
+       
+        swarm.pointers[$p] + $frames
+        
+        if swarm.pointers[$p] >= swarm.start_pos + swarm.loop_length
+        {
+            swarm.pointers[$p] = swarm.start_pos + swarm.pointers[$p] - (swarm.start_pos + swarm.loop_length)
+        }
+        
+        if swarm.pointers[$p] < swarm.start_pos
+        {
+            swarm.pointers[$p] = swarm.start_pos
+        }
+        
         $p + 1
     }
 

@@ -45,7 +45,7 @@ include "buttons.pixi"
 load_wav()
 
 swarm = create_swarm()
-swarm.init_pointers(swarm)
+swarm.init_swarm(swarm)
 
 
 buttons = create_buttons()
@@ -58,6 +58,7 @@ touch_state.move = 0
 
 
 
+set_audio_callback(audio_callback, 0, 44100, get_type( wave_window.data ), 1 ,AUDIO_FLAG_INTERP2 )
 
 
 
@@ -140,8 +141,6 @@ fn load_wav()
                                         )
 
     }
-    $wav_data = wave_window.data
-    set_audio_callback(audio_callback, 0, 44100, get_type( $wav_data ), 1 ,AUDIO_FLAG_INTERP2 )
 
 }
 

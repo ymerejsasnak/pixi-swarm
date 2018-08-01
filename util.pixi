@@ -1,18 +1,10 @@
-// generate random integer
-// 0, 1, or 2 params: 
-// if 0, randomly returns either a 1 or 0
-// if 1, returns random int in range [0, value)
-// if 2, returns a random int in range [value1, value2)
+
 fn randint()
 {
     $min = $1
     $max = $2
     
-    if $1 == 0
-    {
-        $min = 0
-        $max = 2  // ie, return only 0 or 1
-    }
+    
     if $1 != 0 && $2 == 0
     {
         $min = 0
