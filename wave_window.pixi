@@ -114,8 +114,19 @@ fn create_wave_window($data, $x, $y, $xsize, $ysize)
         $p = 0
         while ($p < swarm.voice_count)
         {
+            if swarm.pointers[$p] >= swarm.start_pos &&
+                swarm.pointers[$p] < swarm.start_pos + swarm.loop_length
+            {
+                 $c = get_blend(YELLOW, RED, scale(swarm.volumes[$p], 0, 1, 0, 255))
+            }
+            else
+            {
+                 $c = get_blend(WHITE, BLACK, 150)
+            }
+            
             dot(scale(swarm.pointers[$p], 0, swarm.wav_size, $this.x, $this.x + $this.xsize), 
-                scale($p, 0, swarm.voice_count, $this.y + 1, $this.y + $this.ysize - 1))
+                scale($p, 0, swarm.voice_count, $this.y + 1, $this.y + $this.ysize - 1), $c)
+            
             $p + 1
         }
     }   

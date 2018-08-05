@@ -1,25 +1,11 @@
 // need to handle stereo wavs!!! and 32 bit wavs
 
-// need to reset pointers on loading new wav
-
-// draw playback indicators for each pointer? (brightness as volume too)
 
 // need to scale volume down per voice
 // convert to 32 bit for more headroom? then normalize before outputing?
 
 
-//possible controls/options/etc:
-// swarm density (# of pointers)
-// loop length (per pointer)
-// loop change probability, loop change range
-// direction (forward or reverse)
-// main loop start point
-// loop start range
-// options for crossfading each loop????
-// attack/release time (for when adding or removing 'voices')
 
-// multiple xy pads (color coded, faded color when not controlled)
-// select which to use w/ buttons
 
 
 

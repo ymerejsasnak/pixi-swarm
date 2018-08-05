@@ -10,25 +10,35 @@ fn audio_callback(
 
 	
    
-    clean(swarm.buffer, 0, 0, $frames)
+    clean(swarm.voice_buffer, 0, 0, $frames)
+    clean(swarm.output_buffer, 0, 0, $frames)
+    
     
     $p = 0
     while ($p < swarm.voice_count)
     {
-        op_cc(OP_SADD, swarm.buffer, swarm.wav_data, 0, swarm.pointers[$p], $frames)
+        if swarm.pointers[$p] >= swarm.start_pos &&
+            swarm.pointers[$p] < swarm.start_pos + swarm.loop_length
+        {
+            
+            
+            copy(swarm.voice_buffer, swarm.wav_data, 0, swarm.pointers[$p], $frames, 1, swarm.speeds[$p])
+            
+            swarm.volumes[$p] = min(1, (swarm.pointers[$p] - swarm.start_pos) / 100000)
+            
+            op_cn(OP_MUL, swarm.voice_buffer, swarm.volumes[$p])
+            
+            op_cc(OP_SADD, swarm.output_buffer, swarm.voice_buffer, 0, 0, $frames)
    
+        }
        
-        swarm.pointers[$p] + $frames
+        swarm.pointers[$p] = (swarm.pointers[$p] + $frames * swarm.speeds[$p] * swarm.directions[$p]) % swarm.wav_size
         
-        if swarm.pointers[$p] >= swarm.start_pos + swarm.loop_length
+        if swarm.pointers[$p] < 0
         {
-            swarm.pointers[$p] = swarm.start_pos + swarm.pointers[$p] - (swarm.start_pos + swarm.loop_length)
+            swarm.pointers[$p] = swarm.wav_size + swarm.pointers[$p]
         }
         
-        if swarm.pointers[$p] < swarm.start_pos
-        {
-            swarm.pointers[$p] = swarm.start_pos
-        }
         
         $p + 1
     }
@@ -36,7 +46,7 @@ fn audio_callback(
 	
 
 	    
-    copy($channels[0], swarm.buffer, 0, 0, $frames)
+    copy($channels[0], swarm.output_buffer, 0, 0, $frames)
     
     ret( 1 )
 }
