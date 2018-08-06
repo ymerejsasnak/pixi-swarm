@@ -22,6 +22,9 @@ include "wave_window.pixi"
 include "swarm.pixi"
 include "audiocallback.pixi"
 
+include "slider.pixi"
+include "sliders.pixi"
+
 include "button.pixi"
 include "buttons.pixi"
 
@@ -30,12 +33,11 @@ include "buttons.pixi"
 
 load_wav()
 
-swarm = create_swarm()
-swarm.init_swarm(swarm)
 
 
 buttons = create_buttons()
 
+sliders = create_sliders()
 
 touch_state = new()
 touch_state.down = 0
@@ -74,6 +76,8 @@ while (1)
   		
   		wave_window.update(wave_window, touch_state)
   		buttons.update(buttons, touch_state)
+  		
+  		sliders.update(sliders, touch_state)
   	}
   	
   	
@@ -84,7 +88,9 @@ while (1)
   	wave_window.draw(wave_window)
   	buttons.draw(buttons)
   	
-  	printnum(s, 0, 0)
+  	sliders.draw(sliders)
+  	
+  	//printnum(s, 0, 0)
   	
   	frame()
   	
@@ -115,19 +121,18 @@ fn load_wav()
         if wave_window
         {
             remove(wave_window)
+            remove(swarm)
         }
+        
+        
         $wav_data = load($file)
         
-        wave_window = create_wave_window(
-                                        $wav_data, 
-                                        XMIN + BORDER, 
-                                        YMIN + BORDER, 
-                                        WAVE_WIDTH, 
-                                        WAVE_HEIGHT
-                                        )
+        swarm = create_swarm($wav_data)
+        swarm.init_swarm(swarm)
+        wave_window = create_wave_window(XMIN + BORDER, WAVE_Y, WAVE_WIDTH, WAVE_HEIGHT)
 
     }
-
+    set_audio_callback(audio_callback, 0, 44100, get_type( swarm.wav_data ), 1 ,AUDIO_FLAG_INTERP2 )
 }
 
 

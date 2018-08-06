@@ -1,0 +1,80 @@
+fn create_slider($x, $y, $xsize, $ysize, $start_pos, $min, $max)
+{
+    $this = new()
+    
+    $this.x = $x
+    $this.y = $y
+    $this.xsize = $xsize
+    $this.ysize = $ysize
+    
+    $this.vert = 1
+    
+    $this.pos = $start_pos
+    
+    $this.min = $min
+    $this.max = $max
+    
+      
+    $this.draw = 
+    {
+        $this = $1
+        
+        
+        fbox($this.x, $this.y, $this.xsize, $this.ysize, BLACK)
+        box($this.x, $this.y, $this.xsize, $this.ysize, WHITE)
+                
+        $pos = scale($this.pos, 0, 1, $this.x + HANDLE_SIZE / 2, $this.x + $this.xsize - HANDLE_SIZE / 2)
+        
+           
+        transp(100) 
+        fbox($pos - HANDLE_SIZE / 2, $this.y, HANDLE_SIZE, $this.ysize, WHITE)   
+        transp(255)
+          
+        $val = scale($this.pos, 0, 1, $this.min, $this.max)
+        printnum($val, $this.x + $this.xsize/2, $this.y + $this.ysize / 2)
+        
+    }
+    
+    $this.update =
+    {
+        $this = $1
+        $touch_state = $2
+        
+        
+        
+        if $touch_state.down
+        {
+            
+            
+            if $touch_state.x > $this.x && $touch_state.x < $this.x + $this.xsize &&
+               $touch_state.y > $this.y && $touch_state.y < $this.y + $this.ysize
+            {
+                $this.grab = 1
+            }
+            
+        }       
+        
+        if $touch_state.up  
+        {
+            $this.grab = 0
+          
+        }
+        
+        
+        if $this.grab
+        {
+            
+            
+            $this.pos = scale($touch_state.x, $this.x + HANDLE_SIZE / 2, 
+                               $this.x + $this.xsize - HANDLE_SIZE / 2, 0, 1)
+            
+            
+            if $this.pos > 1 { $this.pos = 1 }
+            if $this.pos < 0 { $this.pos = 0 }
+        }
+            
+    }
+    
+    
+    ret ($this)
+}

@@ -1,7 +1,7 @@
-fn create_swarm()
+fn create_swarm($data)
 {
     $this = new()
-    $this.voice_count = 10
+    $this.voice_count = 300
     
     $this.pointers = new($this.voice_count, 1, INT32)
     $this.volumes = new($this.voice_count, 1, FLOAT32)
@@ -12,19 +12,39 @@ fn create_swarm()
     max_frames = 4096  //??
     
     
-    $this.wav_data = wave_window.data
-    
+    $this.wav_data = $data
     $this.wav_size = get_xsize($this.wav_data)
     $this.wav_type = get_type($this.wav_data)
     
+    $this.sample_info = new( SMP_INFO_SIZE, 1, INT32 )
+	clean( $this.sample_info )
+	$this.sample_info[ SMP_SRC ] = $data
+	$this.sample_info[ SMP_SRC_OFF_H ] = 0
+	$this.sample_info[ SMP_SRC_OFF_L ] = 0
+	$this.sample_info[ SMP_LOOP ] = 0
+	$this.sample_info[ SMP_LOOP_LEN ] = $this.wav_size
+	$this.sample_info[ SMP_VOL1 ] = 32768 / 2
+	$this.sample_info[ SMP_VOL2 ] = 32768 / 2
+	$this.sample_info[ SMP_DELTA ] = ( 1 << 16 )
+	$this.sample_info[ SMP_FLAGS ] = SMP_FLAG_INTERP4
     
-    $this.start_pos = 0
-    $this.loop_length = $this.wav_size
-        
+    
     
     $this.voice_buffer = new(max_frames, 1, $this.wav_type)
     
     $this.output_buffer = new(max_frames, 1, $this.wav_type)
+    
+    
+    
+    $this.sample_info[ SMP_DEST ] = $this.voice_buffer
+	$this.sample_info[ SMP_DEST_OFF ] = 0;
+            
+    
+    
+    $this.window_start = 0
+    $this.window_length = $this.wav_size
+        
+    
     
     
     $this.init_swarm = 
@@ -38,8 +58,11 @@ fn create_swarm()
         {
             $this.pointers[$i] = randint($this.wav_size)
             $this.volumes[$i] = 0
-            $this.speeds[$i] = randint(1, 10)
-            $this.directions[$i] = -1
+            $this.speeds[$i] = randfloat(.95, 1.05)
+            $this.directions[$i] = randint(0, 2)
+            if $this.directions[$i] == 0
+                { $this.directions[$i] = -1 }
+            
             $i + 1
         }
     }

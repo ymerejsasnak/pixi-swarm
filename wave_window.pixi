@@ -1,8 +1,8 @@
-fn create_wave_window($data, $x, $y, $xsize, $ysize)
+fn create_wave_window($x, $y, $xsize, $ysize)
 {
     $this = new()
     
-    $this.data = $data
+    $this.data = swarm.wav_data
     $this.x = $x
     $this.y = $y
     $this.xsize = $xsize
@@ -63,16 +63,16 @@ fn create_wave_window($data, $x, $y, $xsize, $ysize)
              $touch_state.y > $this.y && $touch_state.y < $this.y + $this.ysize
         {
             $this.posx = $touch_state.x
-            swarm.start_pos = scale($this.posx, $this.x, $this.x + $this.xsize, 0, swarm.wav_size)
+            swarm.window_start = scale($this.posx, $this.x, $this.x + $this.xsize, 0, swarm.wav_size)
             
             
             
             $this.posy = $touch_state.y 
-            swarm.loop_length = scale($this.posy, $this.y + $this.ysize, $this.y, 100, swarm.wav_size)
+            swarm.window_length = scale($this.posy, $this.y + $this.ysize, $this.y, 100, swarm.wav_size)
             
-            if swarm.loop_length + swarm.start_pos >= swarm.wav_size
+            if swarm.window_length + swarm.window_start >= swarm.wav_size
             {
-                swarm.loop_length = swarm.wav_size - swarm.start_pos
+                swarm.window_length = swarm.wav_size - swarm.window_start
             }     
           
             
@@ -108,14 +108,18 @@ fn create_wave_window($data, $x, $y, $xsize, $ysize)
         //xy lines
         line($this.posx, $this.y, $this.posx, $this.y + $this.ysize, BLUE)
         //line($this.x, $this.posy, $this.x + $this.xsize, $this.posy, RED)
-        $end = scale(swarm.start_pos + swarm.loop_length, 0, swarm.wav_size, $this.x, $this.x + $this.xsize)
+        $end = scale(swarm.window_start + swarm.window_length, 0, swarm.wav_size, $this.x, $this.x + $this.xsize)
         line($end, $this.y, $end, $this.y + $this.ysize, BLUE)
+        
+        transp(20)
+        fbox($this.posx, $this.y, $end - $this.posx, $this.ysize, BLUE)
+        transp(255)
         
         $p = 0
         while ($p < swarm.voice_count)
         {
-            if swarm.pointers[$p] >= swarm.start_pos &&
-                swarm.pointers[$p] < swarm.start_pos + swarm.loop_length
+            if swarm.pointers[$p] >= swarm.window_start &&
+                swarm.pointers[$p] < swarm.window_start + swarm.window_length
             {
                  $c = get_blend(YELLOW, RED, scale(swarm.volumes[$p], 0, 1, 0, 255))
             }

@@ -1,0 +1,97 @@
+fn create_sliders()
+{
+
+    //create_slider($x, $y, $xsize, $ysize, $start_pos, $min, $max)
+
+    $this = new(SLIDER_COUNT)
+    
+   
+    // top sliders //
+    
+    // voice count
+    $this[0] = create_slider(XMIN + BORDER, 
+                             YMIN + BORDER, 
+                             TOP_SLIDER_LENGTH,
+                             SLIDER_WIDTH,
+                             .5, 1, 1000)
+                      
+    // reverse % 
+    $this[1] = create_slider(XMIN + BORDER + BORDER + TOP_SLIDER_LENGTH,
+                             YMIN + BORDER,
+                             TOP_SLIDER_LENGTH,
+                             SLIDER_WIDTH,
+                             0, 0, 100)  
+      
+   
+    // fade in 
+    $this[2] = create_slider(XMIN + BORDER, 
+                             YMIN + BORDER + BORDER + SLIDER_WIDTH,
+                             TOP_SLIDER_LENGTH,
+                             SLIDER_WIDTH,
+                             .25, 0, 100)  
+                                                    
+    // fade out 
+    $this[3] = create_slider(XMIN + BORDER + BORDER + TOP_SLIDER_LENGTH, 
+                             YMIN + BORDER + BORDER + SLIDER_WIDTH,
+                             TOP_SLIDER_LENGTH,
+                             SLIDER_WIDTH,
+                             .25, 0, 100)  
+   
+   
+    // freq range
+    $this[4] = create_slider(XMIN + BORDER, 
+                             YMIN + BORDER + (BORDER + SLIDER_WIDTH) * 2,
+                             TOP_SLIDER_LENGTH,
+                             SLIDER_WIDTH,
+                             0, 0, 2)  
+                                                    
+    // freg spacing 
+    $this[5] = create_slider(XMIN + BORDER + BORDER + TOP_SLIDER_LENGTH, 
+                             YMIN + BORDER + (BORDER + SLIDER_WIDTH) * 2,
+                             TOP_SLIDER_LENGTH,
+                             SLIDER_WIDTH,
+                             0, .1, 1)  
+    
+    
+    // bottom slider //
+    
+    $this[6] = create_slider(XMIN + BORDER,
+                             BOTTOM_SLIDER_ROW + BORDER,
+                             XSIZE - BORDERS,
+                             SLIDER_WIDTH,
+                             .5, .25, 4)
+
+
+
+    $this.update =
+    {
+        $this = $1
+        $touch_state = $2
+        
+        $i = 0
+        while ($i < SLIDER_COUNT)
+        {
+            
+            $this[$i].update($this[$i], $touch_state)
+            $i + 1
+        }
+    }
+    
+    
+    
+    $this.draw = 
+    {
+        $this = $1
+        
+        $i = 0
+        while ($i < SLIDER_COUNT)
+        {
+            $this[$i].draw($this[$i])
+            $i + 1
+        }
+    }
+
+
+    ret($this)
+}
+

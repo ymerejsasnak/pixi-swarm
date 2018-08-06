@@ -17,22 +17,40 @@ fn audio_callback(
     $p = 0
     while ($p < swarm.voice_count)
     {
-        if swarm.pointers[$p] >= swarm.start_pos &&
-            swarm.pointers[$p] < swarm.start_pos + swarm.loop_length
+        if swarm.pointers[$p] >= swarm.window_start &&
+            swarm.pointers[$p] < swarm.window_start + swarm.window_length
         {
+            if swarm.directions[$p] == -1
+            {
+                swarm.sample_info[ SMP_FLAGS ] = SMP_FLAG_INTERP4 | SMP_FLAG_REVERSE
+            }
+            else
+            {
+                swarm.sample_info[ SMP_FLAGS ] = SMP_FLAG_INTERP4
+            }
             
+            swarm.volumes[$p] = min(1, (swarm.pointers[$p] - swarm.window_start) / 100000)
             
-            copy(swarm.voice_buffer, swarm.wav_data, 0, swarm.pointers[$p], $frames, 1, swarm.speeds[$p])
+            swarm.sample_info[SMP_VOL1] = 32767 * swarm.volumes[$p]
+            swarm.sample_info[SMP_VOL2] = 32767 * swarm.volumes[$p]
+        
             
-            swarm.volumes[$p] = min(1, (swarm.pointers[$p] - swarm.start_pos) / 100000)
+            swarm.sample_info[ SMP_SRC_OFF_H ] = floor(swarm.pointers[$p])
+            swarm.sample_info[ SMP_SRC_OFF_L ] = swarm.pointers[$p] - floor(swarm.pointers[$p])
             
-            op_cn(OP_MUL, swarm.voice_buffer, swarm.volumes[$p])
+            swarm.sample_info[ SMP_DELTA ] = (1 << 16) * swarm.speeds[$p]
+            
+	        swarm.sample_info[ SMP_DEST_LEN ] = $frames;
+            sampler( swarm.sample_info )
+            
             
             op_cc(OP_SADD, swarm.output_buffer, swarm.voice_buffer, 0, 0, $frames)
    
         }
        
+        
         swarm.pointers[$p] = (swarm.pointers[$p] + $frames * swarm.speeds[$p] * swarm.directions[$p]) % swarm.wav_size
+            
         
         if swarm.pointers[$p] < 0
         {
