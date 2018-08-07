@@ -38,7 +38,7 @@ fn audio_callback(
             swarm.sample_info[ SMP_SRC_OFF_H ] = floor(swarm.pointers[$p])
             swarm.sample_info[ SMP_SRC_OFF_L ] = swarm.pointers[$p] - floor(swarm.pointers[$p])
             
-            swarm.sample_info[ SMP_DELTA ] = (1 << 16) * swarm.speeds[$p]
+            swarm.sample_info[ SMP_DELTA ] = (1 << 16) * swarm.speeds[$p] * swarm.base_speed
             
 	        swarm.sample_info[ SMP_DEST_LEN ] = $frames;
             sampler( swarm.sample_info )
@@ -49,7 +49,7 @@ fn audio_callback(
         }
        
         
-        swarm.pointers[$p] = (swarm.pointers[$p] + $frames * swarm.speeds[$p] * swarm.directions[$p]) % swarm.wav_size
+        swarm.pointers[$p] = (swarm.pointers[$p] + $frames * swarm.speeds[$p] * swarm.base_speed * swarm.directions[$p]) % swarm.wav_size
             
         
         if swarm.pointers[$p] < 0

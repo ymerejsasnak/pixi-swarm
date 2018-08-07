@@ -1,13 +1,18 @@
 fn create_swarm($data)
 {
     $this = new()
-    $this.voice_count = 300
+    $this.voice_count = 100
     
-    $this.pointers = new($this.voice_count, 1, INT32)
-    $this.volumes = new($this.voice_count, 1, FLOAT32)
-    $this.speeds = new($this.voice_count, 1, FLOAT32)
-    $this.directions = new($this.voice_count, 1)
+    $this.pointers = new(MAX_VOICE_COUNT, 1, INT32)
+    $this.volumes = new(MAX_VOICE_COUNT, 1, FLOAT32)
+    $this.speeds = new(MAX_VOICE_COUNT, 1, FLOAT32)
+    $this.directions = new(MAX_VOICE_COUNT, 1)
        
+    $this.base_speed = 1
+    $this.reverse_percent = 0
+    $this.speed_count = 1
+    $this.speed_spacing = 1
+    
        
     max_frames = 4096  //??
     
@@ -54,20 +59,94 @@ fn create_swarm($data)
         
     
         $i = 0
-        while ($i < $this.voice_count)
+        while ($i < MAX_VOICE_COUNT)
         {
             $this.pointers[$i] = randint($this.wav_size)
             $this.volumes[$i] = 0
-            $this.speeds[$i] = randfloat(.95, 1.05)
-            $this.directions[$i] = randint(0, 2)
-            if $this.directions[$i] == 0
-                { $this.directions[$i] = -1 }
+           
+            $this.set_directions($this, $i)
+            $this.set_speeds($this, $i)
             
             $i + 1
         }
     }
 
 
+    
+    
+    $this.update =
+    {
+        $this = $1
+        $sliders = $2
+        
+        
+        $this.voice_count = scale($sliders[0].pos, 0, 1, $sliders[0].min, $sliders[0].max)
+        
+                
+        $new_reverse = scale($sliders[1].pos, 0, 1, $sliders[1].min, $sliders[1].max)
+        
+        if $sliders[1].grab == 0 && $this.reverse_percent != $new_reverse
+        {
+            $this.reverse_percent = $new_reverse
+            
+            $i = 0
+            while ($i < MAX_VOICE_COUNT)
+            {
+                $this.set_directions($this, $i)
+                $i + 1
+            }
+        }
+    
+            
+        $new_count = scale($sliders[4].pos, 0, 1, $sliders[4].min, $sliders[4].max) 
+        
+        $new_spacing = scale($sliders[5].pos, 0, 1, $sliders[5].min, $sliders[5].max) 
+        
+        if $this.speed_count != $new_count || $this.speed_spacing != $new_spacing
+        {
+            $this.speed_count = $new_count
+            $this.speed_spacing = $new_spacing
+            $i = 0
+            while ($i < MAX_VOICE_COUNT)
+            {
+                $this.set_speeds($this, $i)
+                $i + 1
+            }
+        }
+        
+    
+    
+        $this.base_speed = scale($sliders[6].pos, 0, 1, $sliders[6].min, $sliders[6].max) 
+    
+    }
+    
+    $this.set_directions =
+    {
+        $this = $1
+        $i = $2
+        
+        if randint(0, 100) < $this.reverse_percent
+        {
+            $this.directions[$i] = -1
+        }
+        else
+        {
+            $this.directions[$i] = 1
+        }
+        
+    }
+    
+    $this.set_speeds =
+    {
+        $this = $1
+        $i = $2
+        
+        $this.speeds[$i] = 1 + randint(0, floor($this.speed_count)) * $this.speed_spacing
+            
+    
+    }
+    
+    
     ret($this)
 
 }

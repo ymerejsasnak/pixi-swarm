@@ -1,11 +1,30 @@
-// need to handle stereo wavs!!! and 32 bit wavs
+// implement fade in/out w/ values from sliders (and address any bugs/glitches with it?)
 
 
+// add 2nd freq bar for "fine tune" freq control
+
+// wave window:  end point is button2/touch2 not y, y is volume?
+
+// sliders: add text description to values, also floor any values that shouldn't be floats
+
+
+// add support for stereo wavs (and output)
+
+// add support for 32bit wavs (maybe convert 16 internally to 32 anyway)
+
+
+// implement recording (mostly easy I think)
+
+
+// once stereo is go, add panning options/slider(s) too?
+
+
+// ????
 // need to scale volume down per voice
 // convert to 32 bit for more headroom? then normalize before outputing?
 
 
-
+// clean, refactor, bugs/issues, ui/colors, tweak values/ranges, comment, etc.
 
 
 
@@ -78,6 +97,8 @@ while (1)
   		buttons.update(buttons, touch_state)
   		
   		sliders.update(sliders, touch_state)
+  		
+  		swarm.update(swarm, sliders)
   	}
   	
   	
@@ -90,7 +111,9 @@ while (1)
   	
   	sliders.draw(sliders)
   	
-  	//printnum(s, 0, 0)
+  	s = ""
+  	sprintf(s, "%f   %f   %f", swarm.base_speed, swarm.speeds[0], swarm.speeds[1])
+  	print(s, 0, 20)
   	
   	frame()
   	

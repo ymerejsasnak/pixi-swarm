@@ -7,7 +7,6 @@ fn create_slider($x, $y, $xsize, $ysize, $start_pos, $min, $max)
     $this.xsize = $xsize
     $this.ysize = $ysize
     
-    $this.vert = 1
     
     $this.pos = $start_pos
     
