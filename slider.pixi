@@ -1,4 +1,4 @@
-fn create_slider($x, $y, $xsize, $ysize, $start_pos, $min, $max)
+fn create_slider($x, $y, $xsize, $ysize, $start_pos, $min, $max, $int, $label)
 {
     $this = new()
     
@@ -13,6 +13,9 @@ fn create_slider($x, $y, $xsize, $ysize, $start_pos, $min, $max)
     $this.min = $min
     $this.max = $max
     
+    $this.int = $int
+    
+    $this.label = $label
       
     $this.draw = 
     {
@@ -30,7 +33,23 @@ fn create_slider($x, $y, $xsize, $ysize, $start_pos, $min, $max)
         transp(255)
           
         $val = scale($this.pos, 0, 1, $this.min, $this.max)
-        printnum($val, $this.x + $this.xsize/2, $this.y + $this.ysize / 2)
+        if $this.int
+        {
+            $val = floor($val)
+        }
+        
+        $s = ""
+        if $this.int
+        {
+            sprintf($s, "%s - %d", $this.label, $val)
+        }
+        else
+        {
+            sprintf($s, "%s - %f", $this.label, $val)
+        }
+        
+        print($s, $this.x + $this.xsize/2, $this.y + $this.ysize / 2)
+        //printnum($val, $this.x + $this.xsize/2, $this.y + $this.ysize / 2)
         
     }
     

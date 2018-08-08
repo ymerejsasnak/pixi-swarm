@@ -1,11 +1,12 @@
-// implement fade in/out w/ values from sliders (and address any bugs/glitches with it?)
+// pull out any uneccessary calculations and stuff from audio callback (put in swarm.update?)
 
-
-// add 2nd freq bar for "fine tune" freq control
 
 // wave window:  end point is button2/touch2 not y, y is volume?
 
-// sliders: add text description to values, also floor any values that shouldn't be floats
+
+
+// voice count slider at 1 leaves 2 voices??????? (not always...?)
+
 
 
 // add support for stereo wavs (and output)

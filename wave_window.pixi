@@ -128,8 +128,9 @@ fn create_wave_window($x, $y, $xsize, $ysize)
                  $c = get_blend(WHITE, BLACK, 150)
             }
             
-            dot(scale(swarm.pointers[$p], 0, swarm.wav_size, $this.x, $this.x + $this.xsize), 
-                scale($p, 0, swarm.voice_count, $this.y + 1, $this.y + $this.ysize - 1), $c)
+            fbox(scale(swarm.pointers[$p], 0, swarm.wav_size, $this.x, $this.x + $this.xsize), 
+                scale($p, 0, swarm.voice_count, $this.y + 1, $this.y + $this.ysize - 1),
+                5, 5, $c)
             
             $p + 1
         }
