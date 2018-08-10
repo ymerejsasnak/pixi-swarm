@@ -1,18 +1,26 @@
+// function to create a container for the buttons in the program
+// uses create_button from "button.pixi"
+
 fn create_buttons()
 {
     $this = new(BUTTON_COUNT)
     
+    
+    // button to load a sound
     $this[0] = create_button(BUTTON1 + BORDER, BUTTON_ROW + BORDER, BUTTON_WIDTH, BUTTON_HEIGHT, 
     "LOAD", load_wav)
             
+    // button to record audio
     $this[1] = create_button(BUTTON2 + BORDER, BUTTON_ROW + BORDER, BUTTON_WIDTH, BUTTON_HEIGHT, 
     "REC")
     
+    // button to exit program (by running 'cleanup')
     $this[2] = create_button(BUTTON3 + BORDER, BUTTON_ROW + BORDER, BUTTON_WIDTH, BUTTON_HEIGHT, 
     "EXIT", cleanup)
 
 
 
+    // update all buttons based on touch state (call each individual update function)
     $this.update =
     {
         $this = $1
@@ -28,7 +36,7 @@ fn create_buttons()
     }
     
     
-    
+    // draw all buttons (call each individiual draw function)
     $this.draw = 
     {
         $this = $1
@@ -40,7 +48,6 @@ fn create_buttons()
             $i + 1
         }
     }
-
 
     ret($this)
 }

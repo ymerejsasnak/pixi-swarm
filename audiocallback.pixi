@@ -10,7 +10,7 @@ fn audio_callback(
 
 	
    
-    clean(swarm.voice_buffer, 0, 0, $frames)
+   // clean(swarm.voice_buffer, 0, 0, $frames)
     clean(swarm.output_buffer, 0, 0, $frames)
     
     

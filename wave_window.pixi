@@ -1,3 +1,9 @@
+// function to create the container for the window that shows the waveform of the loaded sample
+// gets wav data from wav loaded into swarm container in create_swarm function in swarm.pixi
+
+// point of possible confusion: this "window" is the visual representation of the loaded soundfile
+// the swarm's "window" is a sort of range of audibility where voices are sent to sound output
+
 fn create_wave_window($x, $y, $xsize, $ysize)
 {
     $this = new()
@@ -8,21 +14,32 @@ fn create_wave_window($x, $y, $xsize, $ysize)
     $this.xsize = $xsize
     $this.ysize = $ysize
 
-    $this.plotmax = new($xsize)
-    $this.plotmin = new($xsize)
-    
+    // pixel coordinates of play position
     $this.posx = $x
     $this.posy = $y
                 
     $this.touch = 0
     
-    $i = 0
+    // create containers to store max and min sample values at each plot point (samples/pixels)
+    $this.plotmax = new($xsize)
+    $this.plotmin = new($xsize)
+
+    // step value for scaling samples to pixels
     $step = get_size($this.data) / $xsize
+    
+    
+    // calculate the plot data
+    $i = 0
     while ($i < $xsize)
     {
+        // start with max and min at current sample
         $max = $this.data[$i * $step]
         $min = $this.data[$i * $step]
         
+        // run through all samples from i + 1 to i + step - 1
+        // to determine max and min sample values for that range of samples
+        // (because it will be rendered only 1 pixel wide as a line, so this
+        // way it catches the peaks and makes a pretty decent looking wave drawing)
         $j = 1
         while ($j < $step)
         {
@@ -35,14 +52,21 @@ fn create_wave_window($x, $y, $xsize, $ysize)
             $j + 1
         }
         
+        
+        // then put those min/max values into plot containers
         $this.plotmax[$i] = scale($max, -(1<<15), (1<<15), -$this.ysize/2, $this.ysize/2)       
         $this.plotmin[$i] = scale($min, -(1<<15), (1<<15), -$this.ysize/2, $this.ysize/2)
+        
+        //      !!! TODO: THE 1<<15 (ie, half of 1<<16) ASSUMES A 16 BIT WAV,
+        //      THIS WILL HAVE TO BE CHANGED TO BE ABLE TO LOAD 32 BIT WAVS!!!
         
         $i + 1
     }
     
     
- 
+    // update wave window based on touch state
+    // (for adjusting window where swarm voices are audible)
+    // TODO:  AND VOLUME?  AND MAKE MULTITOUCH?
     $this.update =
     {
         $this = $1
@@ -62,38 +86,41 @@ fn create_wave_window($x, $y, $xsize, $ysize)
              $touch_state.x > $this.x && $touch_state.x < $this.x + $this.xsize &&
              $touch_state.y > $this.y && $touch_state.y < $this.y + $this.ysize
         {
+            
+            // set swarm window start based on touchx
             $this.posx = $touch_state.x
             swarm.window_start = scale($this.posx, $this.x, $this.x + $this.xsize, 0, swarm.wav_size)
-            
-            
-            
+                        
+            // set swarm window length based on touchy (this will likely change, see above)
             $this.posy = $touch_state.y 
             swarm.window_length = scale($this.posy, $this.y + $this.ysize, $this.y, 100, swarm.wav_size)
             
+            // constrain window_length to not let end of window to go past end of wav
             if swarm.window_length + swarm.window_start >= swarm.wav_size
             {
                 swarm.window_length = swarm.wav_size - swarm.window_start
             }     
-          
-            
-            
-            ret(1)     
+    
         }
-        
-        ret(0)
+
     }
         
     
     
-    
+    // draw wave window
     $this.draw = 
     {
         $this = $1
     
+        // draw main window/box
         fbox($this.x, $this.y, $this.xsize, $this.ysize, get_blend(BLACK, WHITE, 20))
         box($this.x - 1, $this.y - 1, $this.xsize + 2, $this.ysize + 2, WHITE)
+        
+        // calculate position of middle (ie visual position of amplitude 0)
         $midline = $this.y + $this.ysize / 2
         
+        // draw lines from plotmin to plotmax for each pixel across the x range
+        // (this doesn't look great for very short samples, but otherwise it works well)
         $i = 0
         while ($i < $this.xsize)
         {
@@ -101,44 +128,49 @@ fn create_wave_window($x, $y, $xsize, $ysize)
             $i + 1
         }
         
-       
-                
+        // draw the 0 line over the plotted values                
         line($this.x, $midline, $this.x + $this.xsize, $midline, WHITE)
         
-        //xy lines
+        // draw the swarm window of audibility
+        // start line
         line($this.posx, $this.y, $this.posx, $this.y + $this.ysize, BLUE)
-        //line($this.x, $this.posy, $this.x + $this.xsize, $this.posy, RED)
+        
+        // end line
         $end = scale(swarm.window_start + swarm.window_length, 0, swarm.wav_size, $this.x, $this.x + $this.xsize)
         line($end, $this.y, $end, $this.y + $this.ysize, BLUE)
         
+        // transparent color over window range
         transp(20)
         fbox($this.posx, $this.y, $end - $this.posx, $this.ysize, BLUE)
         transp(255)
         
+        // run through all currently active voices and draw 
+        // a small square for each
+        
         $p = 0
         while ($p < swarm.voice_count)
         {
+            // set color for audible voices (ie in swarm window), based on volume
             if swarm.pointers[$p] >= swarm.window_start &&
                 swarm.pointers[$p] < swarm.window_start + swarm.window_length
             {
                  $c = get_blend(YELLOW, RED, scale(swarm.volumes[$p], 0, 1, 0, 255))
             }
+            // set color for inaudible voices (ie out of swarm window)
             else
             {
                  $c = get_blend(WHITE, BLACK, 150)
             }
             
+            // and draw it, scaled to fit with the rest across the y range of the wave window
             fbox(scale(swarm.pointers[$p], 0, swarm.wav_size, $this.x, $this.x + $this.xsize), 
-                scale($p, 0, swarm.voice_count, $this.y + 1, $this.y + $this.ysize - 1),
-                5, 5, $c)
+                scale($p, 0, swarm.voice_count, $this.y + 1, $this.y + $this.ysize - 2),
+                2, 2, $c)
             
             $p + 1
         }
     }   
-    
-    
-    
-    
+ 
     
     ret ($this)
 }

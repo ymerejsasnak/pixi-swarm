@@ -1,5 +1,11 @@
+// function to create a button container
+// $x, $y are for upper left position
+// $xsize, $ysize are button's size of course
+// $text is the string that appears in the button
+// $func is the function to call when this button is pressed
+//      (can either be a function name (ie pointer) or a series of statements in {} )
 
-fn create_button($x, $y, $xsize, $ysize, $text, $func, $obj)
+fn create_button($x, $y, $xsize, $ysize, $text, $func)
 {
 
 	$this = new()
@@ -9,12 +15,14 @@ fn create_button($x, $y, $xsize, $ysize, $text, $func, $obj)
 	$this.y = $y
 	$this.xsize = $xsize
 	$this.ysize = $ysize
-	$this.on = 0
 	
 	$this.func = $func
-	$this.obj = $obj
+
+    // state of button
+  	$this.on = 0
+
 		
-	
+	// button draw function
 	$this.draw =
 	{
 	    $this = $1
@@ -36,36 +44,29 @@ fn create_button($x, $y, $xsize, $ysize, $text, $func, $obj)
 	}	
 	
 	
+	// update button based on touch state
 	$this.update = 
     {
         $this = $1
         $touch_state = $2
        
-              
-         
-                       
-                        
         // reset if already turned on
         if $this.on
         {
             $this.on = 0
         }
-             
-        
-        // send trigger func when clicked
+                     
+        // trigger func when clicked and reset touch_state.down
         if $touch_state.down && $this.on == 0
         {
             if $touch_state.x > $this.x && $touch_state.x < $this.x + $this.xsize &&
                $touch_state.y > $this.y && $touch_state.y < $this.y + $this.ysize
             {
                 $this.on = 1
-                $this.func($this.obj)
+                $this.func()
                 $touch_state.down = 0
             }
         }
-      
-        
-        
 	}   
     
 	ret ($this)

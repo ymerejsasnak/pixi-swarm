@@ -1,3 +1,11 @@
+// function to create a slider container
+// $x, $y are for upper left position
+// $xsize, $ysize are size of course
+// $start_pos is the starting position of the slider (0 is full left, 1 is full right)
+// $min and $max are the range of actual output values of the slider (scaled from 0 to 1 position)
+// $int takes a 1 or a 0, 1 meaning the output should be floored to be an integer, 0 meaning leave it as float
+// $label is the text label that appears before the value shown in the slider
+
 fn create_slider($x, $y, $xsize, $ysize, $start_pos, $min, $max, $int, $label)
 {
     $this = new()
@@ -7,7 +15,6 @@ fn create_slider($x, $y, $xsize, $ysize, $start_pos, $min, $max, $int, $label)
     $this.xsize = $xsize
     $this.ysize = $ysize
     
-    
     $this.pos = $start_pos
     
     $this.min = $min
@@ -16,54 +23,63 @@ fn create_slider($x, $y, $xsize, $ysize, $start_pos, $min, $max, $int, $label)
     $this.int = $int
     
     $this.label = $label
+    
+    // flag for whether this slider is 'grabbed' by click/touch or not
+    $this.grab = 0
       
+    // actual scaled value
+    $this.val = scale($this.pos, 0, 1, $this.min, $this.max)
+    if $this.int
+    {
+        $val = floor($val)
+    }
+    
+        
+      
+    // draw the slider 
     $this.draw = 
     {
         $this = $1
         
-        
+        // main rectangle of slider
         fbox($this.x, $this.y, $this.xsize, $this.ysize, BLACK)
         box($this.x, $this.y, $this.xsize, $this.ysize, WHITE)
-                
-        $pos = scale($this.pos, 0, 1, $this.x + HANDLE_SIZE / 2, $this.x + $this.xsize - HANDLE_SIZE / 2)
         
-           
+        // get draw position based on x_pos and adjust for handle size        
+        $draw_pos = scale($this.pos, 0, 1, $this.x + HANDLE_SIZE / 2, $this.x + $this.xsize - HANDLE_SIZE / 2)
+        
+        // draw transparent box for 'handle' at draw position
         transp(100) 
-        fbox($pos - HANDLE_SIZE / 2, $this.y, HANDLE_SIZE, $this.ysize, WHITE)   
+        fbox($draw_pos - HANDLE_SIZE / 2, $this.y, HANDLE_SIZE, $this.ysize, WHITE)   
         transp(255)
           
-        $val = scale($this.pos, 0, 1, $this.min, $this.max)
-        if $this.int
-        {
-            $val = floor($val)
-        }
         
+        // format string for label/value and print it inside slider
         $s = ""
         if $this.int
         {
-            sprintf($s, "%s - %d", $this.label, $val)
+            sprintf($s, "%s - %d", $this.label, $this.val)
         }
         else
         {
-            sprintf($s, "%s - %f", $this.label, $val)
+            sprintf($s, "%s - %f", $this.label, $this.val)
         }
         
         print($s, $this.x + $this.xsize/2, $this.y + $this.ysize / 2)
-        //printnum($val, $this.x + $this.xsize/2, $this.y + $this.ysize / 2)
         
     }
     
+    
+    // slider update function
     $this.update =
     {
         $this = $1
         $touch_state = $2
         
         
-        
+        // grab handle if down and inside coordinates
         if $touch_state.down
         {
-            
-            
             if $touch_state.x > $this.x && $touch_state.x < $this.x + $this.xsize &&
                $touch_state.y > $this.y && $touch_state.y < $this.y + $this.ysize
             {
@@ -72,23 +88,28 @@ fn create_slider($x, $y, $xsize, $ysize, $start_pos, $min, $max, $int, $label)
             
         }       
         
+        // release handle on up
         if $touch_state.up  
         {
             $this.grab = 0
-          
         }
         
         
+        // update pos/value if grabbed
         if $this.grab
         {
-            
-            
             $this.pos = scale($touch_state.x, $this.x + HANDLE_SIZE / 2, 
                                $this.x + $this.xsize - HANDLE_SIZE / 2, 0, 1)
             
-            
             if $this.pos > 1 { $this.pos = 1 }
             if $this.pos < 0 { $this.pos = 0 }
+            
+            // and update val based on pos
+            $this.val = scale($this.pos, 0, 1, $this.min, $this.max)
+            if $this.int
+            {
+                $val = floor($val)
+            }
         }
             
     }

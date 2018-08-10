@@ -1,38 +1,37 @@
-// pull out any uneccessary calculations and stuff from audio callback (put in swarm.update?)
+/* 
+==TO DO==
 
+- pull uneccessary calculations and stuff out of audio callback and put in swarm.update
 
-// wave window:  end point is button2/touch2 not y, y is volume?
+- implement recording (should be pretty easy, enable rec, copy swarmbuffer to record buffer, save recbuff)
+        some adjustments may need to be made once implemented 32bit and/or stereo
 
+- add support for stereo wavs and stereo output
+        will need to make changes to audiocallback mostly
+        but also wave window (to plot/display left/right channels)
+        and possibly swarm stuff as well
+        (add slider for panning randomness/stereo spread???)
 
+- add support for 32 bit waves (and 8 bit??)
+        basically same notes as above
+        consider as a solution converting 16bit to 32bit on load and only dealing with 32bit internally
+               (will 32 bit also allow me infinite headroom which I can then just normalize before output?)
 
-// voice count slider at 1 leaves 2 voices??????? (not always...?)
+- add multitouch support (ie so can use multiple sliders at once, etc)
+- then, change window control to be touch1x start, touch2x end, and touchy as volume (per voice or sum?)
 
+- use 'constants' for UI colors
 
+- figure out how to best approach volume issues (to quiet, too loud, etc)
+        some of above (window vol control, 32 bit and normalize) may address this
 
-// add support for stereo wavs (and output)
+- finish cleaning/refactoring/commenting swarm.pixi and audiocallback.pixi
 
-// add support for 32bit wavs (maybe convert 16 internally to 32 anyway)
+- tweak colors and values/ranges of sliders, etc
 
+- extensive testing for bug hunting and FUN!  also release on forum!
 
-// implement recording (mostly easy I think)
-
-
-// once stereo is go, add panning options/slider(s) too?
-
-
-// ????
-// need to scale volume down per voice
-// convert to 32 bit for more headroom? then normalize before outputing?
-
-
-// clean, refactor, bugs/issues, ui/colors, tweak values/ranges, comment, etc.
-
-
-
-set_pixel_size(1)
-
-resize( get_screen(), WINDOW_XSIZE, WINDOW_YSIZE )
-
+*/
 
 
 include "constants.pixi"
@@ -50,10 +49,9 @@ include "buttons.pixi"
 
 
 
+// setup/create necessary stuff
 
 load_wav()
-
-
 
 buttons = create_buttons()
 
@@ -64,14 +62,16 @@ touch_state.down = 0
 touch_state.up = 0
 touch_state.move = 0
 
+clear(get_blend(BLACK, WHITE, 130))
 
 
-set_audio_callback(audio_callback, 0, 44100, get_type( wave_window.data ), 1 ,AUDIO_FLAG_INTERP2 )
 
-
+/////// MAIN LOOP ////////////////////////////////
 
 while (1)
 {
+
+    // update touch_state container based on events
     while get_event()
     {
         touch_state.down = 0
@@ -94,51 +94,47 @@ while (1)
   		touch_state.y = EVT[ EVT_Y ]
   		
   		
+  		// and update various containers using new touch_state values
   		wave_window.update(wave_window, touch_state)
   		buttons.update(buttons, touch_state)
-  		
   		sliders.update(sliders, touch_state)
   		
+  		// and update swarm values based on sliders
   		swarm.update(swarm, sliders)
   	}
   	
   	
-  	
-  	clear(get_blend(BLACK, WHITE, 130))
-  	
-  	
+  	// draw ui elements
   	wave_window.draw(wave_window)
   	buttons.draw(buttons)
-  	
   	sliders.draw(sliders)
-  	
-  	s = ""
-  	sprintf(s, "%f   %f   %f", swarm.base_speed, swarm.speeds[0], swarm.speeds[1])
-  	print(s, 0, 20)
-  	
+  	  	
   	frame()
-  	
-  	
 }
 
+///////////////////////////////////////////////////
 
 
+
+
+// function to clean things up and end program (currently does very little)
 fn cleanup()
 {
 
     set_audio_callback(-1)
     
-    
+    // remove containers, etc?
     
     halt
 }
 
 
-
+// load a wav file, give the data to swarm, init the swarm values, and create the display window
 fn load_wav()
 {
 
     set_audio_callback(-1)
+    
     $file = file_dialog( "Select a wav file", "wav", "fff" )
     if $file > -1
     {
@@ -148,15 +144,19 @@ fn load_wav()
             remove(swarm)
         }
         
-        
         $wav_data = load($file)
         
         swarm = create_swarm($wav_data)
         swarm.init_swarm(swarm)
+    
         wave_window = create_wave_window(XMIN + BORDER, WAVE_Y, WAVE_WIDTH, WAVE_HEIGHT)
+        
+        
+      // sound automatically starts playing upon load
+      set_audio_callback(audio_callback, 0, 44100, get_type( swarm.wav_data ), 1 ,AUDIO_FLAG_INTERP2 )
 
     }
-    set_audio_callback(audio_callback, 0, 44100, get_type( swarm.wav_data ), 1 ,AUDIO_FLAG_INTERP2 )
+    
 }
 
 

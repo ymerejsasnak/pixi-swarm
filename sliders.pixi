@@ -1,7 +1,10 @@
+// function to create container for all sliders
+// uses create_slider from slider.pixi
+
 fn create_sliders()
 {
-
-    //create_slider($x, $y, $xsize, $ysize, $start_pos, $min, $max, $int)
+    // reminder for create_slider function parameters:
+    // create_slider($x, $y, $xsize, $ysize, $start_pos, $min, $max, $int)
 
     $this = new(SLIDER_COUNT)
     
@@ -43,14 +46,14 @@ fn create_sliders()
                              YMIN + BORDER + (BORDER + SLIDER_WIDTH) * 2,
                              TOP_SLIDER_LENGTH,
                              SLIDER_WIDTH,
-                             0, 1, 10, 1, "speed count")  
+                             0, 1, 20, 1, "speed count")  
                                                     
     // speed spacing 
     $this[5] = create_slider(XMIN + BORDER + BORDER + TOP_SLIDER_LENGTH, 
                              YMIN + BORDER + (BORDER + SLIDER_WIDTH) * 2,
                              TOP_SLIDER_LENGTH,
                              SLIDER_WIDTH,
-                             1, .001, 2, 0, "speed spacing")  
+                             1, .0001, 1, 0, "speed spacing")  
     
     
     // bottom slider //
@@ -61,10 +64,10 @@ fn create_sliders()
                              BOTTOM_SLIDER_ROW + BORDER,
                              XSIZE - BORDERS,
                              SLIDER_WIDTH,
-                             1/5, .25, 4, 0, "base speed")
+                             3/7, .25, 2, 0, "base speed")
 
 
-
+    // update each slider using its update function
     $this.update =
     {
         $this = $1
@@ -80,7 +83,7 @@ fn create_sliders()
     }
     
     
-    
+    // draw each slider using its draw function
     $this.draw = 
     {
         $this = $1

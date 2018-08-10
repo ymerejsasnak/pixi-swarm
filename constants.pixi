@@ -1,3 +1,12 @@
+// global constants
+// 1 - not really the best practice, but I think it's fine for a small program like this
+// 2 - not actually constants...pixilang has no constants as far as I know (I may be wrong)
+//     so basically a variable in all caps means DO NOT CHANGE ME
+
+
+
+// SCREEN 
+
 scr = get_screen()
 XMIN = -get_xsize(scr) / 2
 XMAX = get_xsize(scr) / 2
@@ -7,6 +16,9 @@ YMAX = get_ysize(scr) / 2
 XSIZE = XMAX - XMIN
 YSIZE = YMAX - YMIN
 
+
+
+// UI STUFF
 
 BORDER = 5
 BORDERS = BORDER * 2
@@ -19,18 +31,17 @@ TOP_SLIDER_LENGTH = XSIZE / 2 - BORDER * 1.5
 HANDLE_SIZE = 40
 
 
-
 WAVE_Y = YMIN + (SLIDER_WIDTH + BORDER) * 3 + BORDER
 WAVE_WIDTH = XSIZE - BORDERS
-WAVE_HEIGHT = YSIZE * .125 * 5 - BORDER * 7//YSIZE * 2 / 3 - BORDERS - (SLIDER_WIDTH + BORDERS) * 3
+WAVE_HEIGHT = YSIZE * .125 * 5 - BORDER * 7
+
 
 BOTTOM_SLIDER_ROW = WAVE_Y + WAVE_HEIGHT
 
 
-
 BUTTON_COUNT = 3
 BUTTON_WIDTH = XSIZE / 3 - BORDERS
-BUTTON_HEIGHT = YSIZE * .125 //YSIZE - (WAVE_HEIGHT + SLIDER_WIDTH * 4 + BORDERS * 5)
+BUTTON_HEIGHT = YSIZE * .125
 
  
 BUTTON_ROW = BOTTOM_SLIDER_ROW + BORDER + SLIDER_WIDTH
@@ -41,5 +52,7 @@ BUTTON2 = XMIN + XSIZE * 1/3
 BUTTON3 = XMIN + XSIZE * 2/3
 
 
+
+// SWARM/AUDIO
 
 MAX_VOICE_COUNT = 500

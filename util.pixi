@@ -1,44 +1,17 @@
+// return int in range [min, max)
 
-fn randint()
+fn randint($min, $max)
 {
-    $min = $1
-    $max = $2
-    
-    
-    if $1 != 0 && $2 == 0
-    {
-        $min = 0
-        $max = $1
-    }    
-
     ret ( floor ( (rand() / 32768) * ($max - $min) + $min ) )
 }
 
 
-// generate random float
-// 0, 1, or 2 params:
-// if 0, randomly returns a float in range [0, 1)
-// if 1, returns a random float in range [0, value)
-// if 2, returns a random float in range [value1, value2)
-fn randfloat()
+// return float in range [x, y)
+
+fn randfloat($min, $max)
 {
-    $min = $1
-    $max = $2
-    
-    if $1 == 0
-    {
-        $min = 0
-        $max = 1
-    }
-    if $1 != 0 && $2 == 0
-    {
-        $min = 0
-        $max = $1
-    }    
-    
     ret ( (rand() / 32768) * ($max - $min) + $min )
 }
-
 
 
 // scale a value from an old range to a new range
@@ -56,8 +29,8 @@ fn scale($value, $inmin, $inmax, $outmin, $outmax)
 // simple helper to more quickly print numbers to screen
 // params:
 // $n - value
-// $x - x position
-// $y - y position
+// $x, $y - coordinates
+
 fn printnum($n, $x, $y)
 {
     $s = ""
@@ -66,33 +39,16 @@ fn printnum($n, $x, $y)
 }
 
 
-//
-fn for($start, $stop, $step, $func)
-{
-    $i = $start
-    while($i < $stop)
-    {
-        $func($i)
-        $i + $step
-    }
-}
-
-
-fn repeat($times, $func)
-{
-    $i = 0
-    while($i < $times)
-    {
-        $func($i)
-        $i + 1
-    }
-}
+// return minimum of x or y
 
 fn min($x, $y)
 {
     if $x < $y { ret ($x) }
     else { ret ($y) }
 }
+
+
+// return max of x or y
 
 fn max($x, $y)
 {
